@@ -1,0 +1,143 @@
+# tiff_binary
+
+binary TIFF images for Chromium
+
+
+
+## status
+
+concept
+
+
+
+## why
+
+the TIFF image format is useful  
+to store [binary images](https://en.wikipedia.org/wiki/Binary_image) compressed with  
+
+- [CCITT Group 4 compression](https://en.wikipedia.org/wiki/Group_4_compression)
+- [JBIG2 compression](https://en.wikipedia.org/wiki/JBIG2)
+
+these binary image compression methods  
+are already supported in the PDF format  
+which is supported by practically all web browsers
+
+they are useful for images of text  
+for example scanned book pages  
+with single-bit depth (bitonal images)  
+and high resolution (usually 600 dpi)
+
+the only usable alternative is the AVIF image format  
+but compressing AVIF images  
+takes about 100 times more CPU time  
+than compressing CCITT-G4 or JBIG2 images  
+to get similar file size and similar visual quality
+
+binary image compression methods  
+are useful for [EPUB-FXL documents](https://github.com/internetarchive/archive-hocr-tools/pull/23)  
+(FXL = fixed layout)  
+which are similar to PDF documents of scanned book pages  
+but implemented in HTML
+
+
+
+## complexity
+
+the TIFF image format is terribly complex  
+which is probably why it is not-yet supported by chromium  
+(high complexity = large attack surface)  
+so i would drastically limit the feature set to
+
+- CCITT Group 4 compression
+- JBIG2 compression
+- one strip
+- one image
+- 1-bit depth only
+- size limits (4 GB, max width, max height)
+
+... which allows us to write a minimal TIFF parser  
+and integrate an existing CCITT-G4 decoder  
+(and later JBIG2 decoder)  
+to reduce the attack surface
+
+
+
+## browser support
+
+some web browsers already support TIFF images  
+probably with different feature sets
+
+- Amaya
+- Avast Secure Browser
+- Falkon
+- Internet Explorer
+- Ladybird
+- Links
+- OmniWeb
+- Safari
+- Shiira
+- WorldWideWeb
+
+... based on
+https://en.wikipedia.org/wiki/Comparison_of_web_browsers#Image_format_support
+
+
+
+## related
+
+https://github.com/Fyrd/caniuse/issues/4281  
+Tiff image format
+
+https://stackoverflow.com/questions/2176991  
+How would I display a TIFF images in all web browsers?
+
+https://en.wikipedia.org/wiki/TIFF
+
+> TIFF is a complex format, defining many tags  
+> of which typically only a few are used in each file.  
+> This led to implementations  
+> supporting many varying subsets of the format,  
+> a situation that gave rise to the joke that TIFF stands for  
+> Thousands of Incompatible File Formats.  
+> This problem was addressed in revision 6.0  
+> of the TIFF specification (June 1992)  
+> by introducing a distinction between Baseline TIFF  
+> (which all implementations were required to support)  
+> and TIFF Extensions (which are optional).  
+
+https://en.wikipedia.org/wiki/Group_4_compression
+
+> Group 4 compression is available in many proprietary image file formats  
+> as well as standardized formats such as TIFF, CALS,  
+> CIT (Intergraph Raster Type 24) and the PDF document format.  
+
+https://en.wikipedia.org/wiki/JBIG2
+
+
+
+## TIFF parsers
+
+https://gitlab.com/libtiff/libtiff  
+many features  
+complex = risky
+
+https://github.com/jkriege2/TinyTIFF  
+no compression
+
+https://github.com/syoyo/tinydng  
+DNG and TIFF format  
+no CCITT-G4 compression
+
+
+
+## CCITT-G4 decoders
+
+https://gitlab.com/libtiff/libtiff/-/blob/master/libtiff/tif_fax3.c
+
+
+
+## JBIG2 decoders
+
+https://github.com/ArtifexSoftware/jbig2dec
+
+https://cgit.freedesktop.org/poppler/poppler/tree/poppler/JBIG2Stream.cc
