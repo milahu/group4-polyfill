@@ -2,8 +2,8 @@
 
 **User:** Milan Hauth (milahu@gmail.com)  
 **Created:** 2026/4/20 18:11:54  
-**Updated:** 2026/4/20 20:10:38  
-**Exported:** 2026/4/20 20:13:12  
+**Updated:** 2026/4/20 20:22:38  
+**Exported:** 2026/4/20 20:26:23  
 **Link:** [https://chatgpt.com/c/69e6501d-69e0-83eb-bc60-8a47f4cf08b9](https://chatgpt.com/c/69e6501d-69e0-83eb-bc60-8a47f4cf08b9)  
 
 ## Prompt:
@@ -1892,6 +1892,209 @@ I can help you upgrade your parser to:
 *   array handling (critical for real TIFF compatibility)
 
 That’s the next step toward making CCITT actually work reliably.
+
+## Prompt:
+Help me upgrade my parser with inline values vs offsets
+
+## Response:
+Good — this is the _real_ point where TIFF stops being “a struct in a file” and becomes “a mildly annoying binary database format.”
+
+Right now your parser is assuming:
+
+> “tag value fits in 4 bytes and is stored inline”
+
+That’s only sometimes true.
+
+You need proper handling of:
+
+*   **inline values**
+*   **offset-to-data values (very common)**
+
+* * *
+
+🧠 Core TIFF rule you’re missing
+================================
+
+Each IFD entry is:
+
+undefined
+
+### The key rule:
+
+> If the value fits in 4 bytes → stored inline  
+> Otherwise → VALUE\_OR\_OFFSET is a pointer into the file
+
+* * *
+
+⚠️ Critical bug in your current parser
+======================================
+
+You are doing this:
+
+undefined
+
+That only works for:
+
+*   scalar values
+*   small counts
+*   lucky encoders
+
+ImageMagick often uses offsets instead.
+
+* * *
+
+🧩 Step 1: You need a “context-aware value reader”
+==================================================
+
+Add this helper:
+
+undefined
+
+* * *
+
+🧠 Step 2: Typed value reading
+==============================
+
+TIFF types matter. Minimal set you need:
+
+undefined
+
+* * *
+
+🧩 Step 3: read value correctly (INLINE vs OFFSET)
+==================================================
+
+This is the core upgrade.
+
+undefined
+
+* * *
+
+🧠 Step 4: correct tag extraction logic
+=======================================
+
+Replace your tag loop with this pattern:
+
+undefined
+
+* * *
+
+🧩 Step 5: INLINE vs OFFSET decision
+====================================
+
+Add this helper:
+
+undefined
+
+* * *
+
+🧠 Step 6: actual value reader
+==============================
+
+This is the important part:
+
+undefined
+
+* * *
+
+🧩 Step 7: fix your tag handling
+================================
+
+Now replace:
+
+undefined
+
+with:
+
+undefined
+
+Do same for:
+
+*   height
+*   strip offsets
+*   strip byte counts
+
+* * *
+
+⚠️ Important subtlety (THIS BIT MATTERS)
+========================================
+
+Some tags are **arrays**, not scalars:
+
+### Example:
+
+*   StripOffsets → array of offsets
+*   StripByteCounts → array of sizes
+
+So you must also handle:
+
+undefined
+
+For your simplified model (single strip), you can enforce:
+
+undefined
+
+* * *
+
+🧪 What this fixes immediately
+==============================
+
+After this upgrade, your parser will correctly handle:
+
+✔ ImageMagick TIFF output  
+✔ Real-world CCITT Group 4 files  
+✔ Offset-based metadata  
+✔ Most baseline TIFF generators
+
+* * *
+
+🧠 Why this is the “real TIFF boundary”
+=======================================
+
+Before this change:
+
+> you were parsing a struct
+
+After this change:
+
+> you are parsing a _pointer-based binary format_
+
+That’s the real TIFF model.
+
+* * *
+
+🚀 Next step (very important)
+=============================
+
+Once this works, the next upgrade is:
+
+👉 Proper strip extraction API
+------------------------------
+
+You currently have:
+
+undefined
+
+Next you want:
+
+*   safe slice view (`Span<uint8_t>`)
+*   zero-copy decoder input
+*   bounds-checked buffer view
+
+This is what will plug into:
+
+*   CCITT decoder
+*   JBIG2 later
+
+* * *
+
+If you want, next I can help you build:
+
+### 🧩 A clean `StripView` abstraction (Chromium-style safe buffer view)
+
+or
+
+### 🧪 A fuzz harness that specifically targets offset parsing bugs (this is where real-world TIFF crashes happen)
 
 
 

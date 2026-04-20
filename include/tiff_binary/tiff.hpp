@@ -77,6 +77,66 @@ private:
     size_t offset_;
 };
 
+struct TiffContext {
+    const uint8_t* data;
+    size_t size;
+    bool little_endian;
+};
+
+enum TiffType : uint16_t {
+    BYTE = 1,
+    ASCII = 2,
+    SHORT = 3,
+    LONG = 4
+};
+
+static uint32_t read_u32(const uint8_t* p, bool le) {
+    if (le) {
+        return (uint32_t)p[0]
+             | (uint32_t)p[1] << 8
+             | (uint32_t)p[2] << 16
+             | (uint32_t)p[3] << 24;
+    } else {
+        return (uint32_t)p[3]
+             | (uint32_t)p[2] << 8
+             | (uint32_t)p[1] << 16
+             | (uint32_t)p[0] << 24;
+    }
+}
+
+static bool is_inline_value(uint16_t type, uint32_t count) {
+    uint32_t size = 0;
+
+    switch (type) {
+        case BYTE:  size = 1; break;
+        case ASCII: size = 1; break;
+        case SHORT: size = 2; break;
+        case LONG:  size = 4; break;
+        default: return false;
+    }
+
+    return (size * count) <= 4;
+}
+
+static uint32_t read_value(
+    const uint8_t* base,
+    size_t size,
+    bool le,
+    uint16_t type,
+    uint32_t count,
+    uint32_t value_or_offset
+) {
+    if (is_inline_value(type, count)) {
+        return value_or_offset;
+    }
+
+    if (value_or_offset + 4 > size) {
+        throw std::runtime_error("Invalid TIFF offset");
+    }
+
+    return read_u32(base + value_or_offset, le);
+}
+
 class TiffParser {
 public:
     static TiffImage parse(const uint8_t* data, size_t size) {
@@ -131,40 +191,52 @@ public:
 
         for (int i = 0; i < entry_count; i++) {
             uint16_t tag = r.read<uint16_t>();
-            uint16_t type = r.read<uint16_t>(); // ignored (we enforce uint32-like usage)
+            uint16_t type = r.read<uint16_t>();
             uint32_t count = r.read<uint32_t>();
             uint32_t value_or_offset = r.read<uint32_t>();
 
+            if (count != 1) {
+                throw std::runtime_error("Only single-strip TIFF supported");
+            }
+
             switch (tag) {
                 case IMAGE_WIDTH:
-                    img.width = value_or_offset;
+                    img.width = read_value(data, size, little_endian, type, count, value_or_offset);
                     has_width = true;
                     break;
 
                 case IMAGE_LENGTH:
-                    img.height = value_or_offset;
+                    img.height = read_value(data, size, little_endian, type, count, value_or_offset);
                     has_height = true;
                     break;
 
                 case COMPRESSION:
-                    img.compression = value_or_offset;
+                    img.compression = read_value(data, size, little_endian, type, count, value_or_offset);
                     break;
 
                 case BITS_PER_SAMPLE:
-                    img.bits_per_sample = (uint16_t)value_or_offset;
+                    img.bits_per_sample = (uint16_t) read_value(data, size, little_endian, type, count, value_or_offset);;
                     break;
 
                 case SAMPLES_PER_PIXEL:
-                    img.samples_per_pixel = (uint16_t)value_or_offset;
+                    img.samples_per_pixel = (uint16_t) read_value(data, size, little_endian, type, count, value_or_offset);;
                     break;
 
                 case STRIP_OFFSETS:
-                    img.strip_offset = value_or_offset;
+                    // Only single-strip TIFF supported
+                    // if (count > 1) {
+                    //     // must read from offset region
+                    // }
+                    img.strip_offset = read_value(data, size, little_endian, type, count, value_or_offset);;
                     has_strip_offset = true;
                     break;
 
                 case STRIP_BYTE_COUNTS:
-                    img.strip_byte_count = value_or_offset;
+                    // Only single-strip TIFF supported
+                    // if (count > 1) {
+                    //     // must read from offset region
+                    // }
+                    img.strip_byte_count = read_value(data, size, little_endian, type, count, value_or_offset);;
                     has_strip_count = true;
                     break;
 
