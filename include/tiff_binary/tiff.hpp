@@ -137,6 +137,26 @@ static uint32_t read_value(
     return read_u32(base + value_or_offset, le);
 }
 
+static inline uint32_t read_u32_le(const uint8_t* data, size_t size, uint32_t offset) {
+    if (offset + 4 > size) {
+        throw std::runtime_error("Out of bounds read");
+    }
+
+    return (uint32_t)data[offset]
+         | (uint32_t)data[offset + 1] << 8
+         | (uint32_t)data[offset + 2] << 16
+         | (uint32_t)data[offset + 3] << 24;
+}
+
+static inline uint32_t read_array_value(
+    const uint8_t* data,
+    size_t size,
+    uint32_t base_offset,
+    uint32_t index
+) {
+    return read_u32_le(data, size, base_offset + index * 4);
+}
+
 class TiffParser {
 public:
     static TiffImage parse(const uint8_t* data, size_t size) {
@@ -189,14 +209,19 @@ public:
         bool has_strip_offset = false;
         bool has_strip_count = false;
 
+        uint32_t strip_offset_count = 0;
+        uint32_t strip_byte_count_count = 0;
+        uint32_t strip_offsets_value_or_offset = 0;
+        uint32_t strip_byte_counts_value_or_offset = 0;
+
         for (int i = 0; i < entry_count; i++) {
             uint16_t tag = r.read<uint16_t>();
             uint16_t type = r.read<uint16_t>();
             uint32_t count = r.read<uint32_t>();
             uint32_t value_or_offset = r.read<uint32_t>();
 
-            if (count != 1) {
-                throw std::runtime_error("Only single-strip TIFF supported");
+            if (count == 0) {
+                throw std::runtime_error("Invalid strip count zero");
             }
 
             switch (tag) {
@@ -223,20 +248,14 @@ public:
                     break;
 
                 case STRIP_OFFSETS:
-                    // Only single-strip TIFF supported
-                    // if (count > 1) {
-                    //     // must read from offset region
-                    // }
-                    img.strip_offset = read_value(data, size, little_endian, type, count, value_or_offset);;
+                    strip_offset_count = count;
+                    strip_offsets_value_or_offset = value_or_offset;
                     has_strip_offset = true;
                     break;
 
                 case STRIP_BYTE_COUNTS:
-                    // Only single-strip TIFF supported
-                    // if (count > 1) {
-                    //     // must read from offset region
-                    // }
-                    img.strip_byte_count = read_value(data, size, little_endian, type, count, value_or_offset);;
+                    strip_byte_count_count = count;
+                    strip_byte_counts_value_or_offset = value_or_offset;
                     has_strip_count = true;
                     break;
 
@@ -267,6 +286,24 @@ public:
             img.compression != NONE) {
             throw std::runtime_error("Unsupported compression");
         }
+
+        if (strip_offset_count != strip_byte_count_count) {
+            throw std::runtime_error("Mismatched strip arrays");
+        }
+
+        img.strip_offset = read_array_value(
+            data,
+            size,
+            strip_offsets_value_or_offset,
+            0
+        );
+
+        img.strip_byte_count = read_array_value(
+            data,
+            size,
+            strip_byte_counts_value_or_offset,
+            0
+        );
 
         // -----------------------------
         // 5. STRICT SINGLE-STRIP RULE
