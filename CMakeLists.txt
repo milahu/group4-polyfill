@@ -8,12 +8,30 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 
 add_library(tiff_binary
-    src/ccitt_g4.cpp
+    # src/third_party/pdfium/core/fxcrt/fx_memory_pa.cpp
+    src/third_party/pdfium/core/fxcrt/fx_memory_malloc.cpp
+
+    src/third_party/pdfium/core/fxcrt/fx_memory.h
+    src/third_party/pdfium/core/fxcrt/fx_memory.cpp
+
+    src/third_party/pdfium/core/fxcrt/debug/alias.h
+    src/third_party/pdfium/core/fxcrt/debug/alias.cc
+
+    src/third_party/pdfium/core/fxge/calculate_pitch.h
+    src/third_party/pdfium/core/fxge/calculate_pitch.cpp
+
+    src/third_party/pdfium/core/fxcodec/scanlinedecoder.h
+    src/third_party/pdfium/core/fxcodec/scanlinedecoder.cpp
+
     src/third_party/pdfium/core/fxcodec/fax/faxmodule.cpp
+
+    src/ccitt_g4.cpp
 )
 
 target_include_directories(tiff_binary PUBLIC
     include
+    # src/build/build_config.h for pdfium
+    src
     src/third_party/pdfium
 )
 

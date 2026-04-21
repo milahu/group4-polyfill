@@ -448,14 +448,21 @@ public:
                 << "\n"
             ;
 
-            decode_ccitt_g4(
+            uint32_t written = decode_ccitt_g4(
                 strip.data,
                 strip.size,
                 img.width,
                 rows,
-                rows_per_strip,
+                // rows_per_strip,
                 strip_out
             );
+
+            // debug
+            std::cout
+                << "Decoded strip " << i
+                << " written=" << written
+                << "\n"
+            ;
 
             // append to final image
             decoded.insert(decoded.end(), strip_out.begin(), strip_out.end());
