@@ -3,9 +3,9 @@
 #include <vector>
 #include <string>
 
-#include "tiff_binary/tiff.hpp"
+#include "tiff_ccitt_g4/tiff.hpp"
 
-static void print_image(const tiff_binary::TiffImage& img) {
+static void print_image(const tiff_ccitt_g4::TiffImage& img) {
     std::cout << "TIFF Parsed Successfully\n";
     std::cout << "------------------------\n";
     std::cout << "Width: " << img.width << "\n";
@@ -13,10 +13,10 @@ static void print_image(const tiff_binary::TiffImage& img) {
 
     std::cout << "Compression: ";
     switch (img.compression) {
-        case tiff_binary::NONE:
+        case tiff_ccitt_g4::NONE:
             std::cout << "NONE";
             break;
-        case tiff_binary::CCITT_GROUP4:
+        case tiff_ccitt_g4::CCITT_GROUP4:
             std::cout << "CCITT_GROUP4";
             break;
         default:
@@ -100,7 +100,7 @@ int main(int argc, char** argv)
     );
 
     try {
-        auto img = tiff_binary::TiffParser::parse(data.data(), data.size());
+        auto img = tiff_ccitt_g4::TiffParser::parse(data.data(), data.size());
         print_image(img);
 
         if (output_path) {

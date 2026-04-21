@@ -1,6 +1,6 @@
-# tiff_binary
+# tiff_ccitt_g4
 
-binary TIFF images for Chromium
+Group4-compressed TIFF images for Chromium
 
 
 

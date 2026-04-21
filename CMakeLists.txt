@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.15)
-project(tiff_binary CXX)
+project(tiff_ccitt_g4 CXX)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -7,7 +7,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 
 
-add_library(tiff_binary
+add_library(tiff_ccitt_g4
     # src/third_party/pdfium/core/fxcrt/fx_memory_pa.cpp
     src/third_party/pdfium/core/fxcrt/fx_memory_malloc.cpp
 
@@ -28,14 +28,14 @@ add_library(tiff_binary
     src/ccitt_g4.cpp
 )
 
-target_include_directories(tiff_binary PUBLIC
+target_include_directories(tiff_ccitt_g4 PUBLIC
     include
     # src/build/build_config.h for pdfium
     src
     src/third_party/pdfium
 )
 
-target_compile_options(tiff_binary PRIVATE
+target_compile_options(tiff_ccitt_g4 PRIVATE
     # -std=c++20
 
     # clang
@@ -48,4 +48,4 @@ target_compile_options(tiff_binary PRIVATE
 
 add_executable(tiff_cli tools/tiff_cli.cpp)
 
-target_link_libraries(tiff_cli PRIVATE tiff_binary)
+target_link_libraries(tiff_cli PRIVATE tiff_ccitt_g4)
