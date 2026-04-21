@@ -1,6 +1,6 @@
 # ccitt_g4_tiff
 
-Group4-compressed TIFF images for Chromium
+minimal decoder for Group4-compressed TIFF images for Chromium
 
 
 
