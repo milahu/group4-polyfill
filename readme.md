@@ -23,7 +23,7 @@ the TIFF image format is useful
 to store [binary images](https://en.wikipedia.org/wiki/Binary_image) compressed with  
 [CCITT Group 4 compression](https://en.wikipedia.org/wiki/Group_4_compression)
 
-this binary image compression methods  
+this binary image compression method  
 is already supported in the PDF format  
 which is supported by practically all web browsers
 
@@ -134,6 +134,33 @@ no CCITT-G4 compression
 ## CCITT-G4 decoders
 
 https://gitlab.com/libtiff/libtiff/-/blob/master/libtiff/tif_fax3.c
+
+
+
+## alternative container formats
+
+except PDF and TIFF, there are ...
+
+
+
+### CALS
+
+https://en.wikipedia.org/wiki/CALS_Raster_file_format
+
+> Continuous Acquisition and Life-cycle Support (CALS)
+
+> a standard storing raster (bit-mapped) image data,
+> either uncompressed or compressed using CCITT Group 4 compression.
+
+https://www.fileformat.info/format/cals/egff.htm
+
+https://gist.github.com/el-hult/90f7495907f8edaa1783db23151e4e36  
+Code for converting a CALS raster file to TIFF. Using vanilla Python.
+
+
+
+### CIT (Intergraph Raster Type 24)
+
 
 
 
