@@ -19,9 +19,6 @@ static void print_image(const tiff_binary::TiffImage& img) {
         case tiff_binary::CCITT_GROUP4:
             std::cout << "CCITT_GROUP4";
             break;
-        case tiff_binary::JBIG2:
-            std::cout << "JBIG2 (stub)";
-            break;
         default:
             std::cout << "UNKNOWN";
             break;

@@ -14,15 +14,13 @@ concept
 
 the TIFF image format is useful  
 to store [binary images](https://en.wikipedia.org/wiki/Binary_image) compressed with  
+[CCITT Group 4 compression](https://en.wikipedia.org/wiki/Group_4_compression)
 
-- [CCITT Group 4 compression](https://en.wikipedia.org/wiki/Group_4_compression)
-- [JBIG2 compression](https://en.wikipedia.org/wiki/JBIG2)
-
-these binary image compression methods  
-are already supported in the PDF format  
+this binary image compression methods  
+is already supported in the PDF format  
 which is supported by practically all web browsers
 
-they are useful for images of text  
+it is useful for images of text  
 for example scanned book pages  
 with single-bit depth (bitonal images)  
 and high resolution (usually 600 dpi)
@@ -30,7 +28,7 @@ and high resolution (usually 600 dpi)
 the only usable alternative is the AVIF image format  
 but compressing AVIF images  
 takes about 100 times more CPU time  
-than compressing CCITT-G4 or JBIG2 images  
+than compressing CCITT-G4 images  
 to get similar file size and similar visual quality
 
 binary image compression methods  
@@ -49,7 +47,6 @@ which is probably why it is not-yet supported by chromium
 so i would drastically limit the feature set to
 
 - CCITT Group 4 compression
-- JBIG2 compression
 - one strip
 - one image
 - 1-bit depth only
@@ -57,7 +54,6 @@ so i would drastically limit the feature set to
 
 ... which allows us to write a minimal TIFF parser  
 and integrate an existing CCITT-G4 decoder  
-(and later JBIG2 decoder)  
 to reduce the attack surface
 
 
@@ -111,8 +107,6 @@ https://en.wikipedia.org/wiki/Group_4_compression
 > as well as standardized formats such as TIFF, CALS,  
 > CIT (Intergraph Raster Type 24) and the PDF document format.  
 
-https://en.wikipedia.org/wiki/JBIG2
-
 
 
 ## TIFF parsers
@@ -136,7 +130,32 @@ https://gitlab.com/libtiff/libtiff/-/blob/master/libtiff/tif_fax3.c
 
 
 
-## JBIG2 decoders
+## out of scope
+
+
+
+### JBIG2 compression
+
+[JBIG2 compression](https://en.wikipedia.org/wiki/JBIG2)
+is out of scope,
+because JBIG2-compressed images dont need a container format like TIFF,
+because JBIG2-compressed images can be standalone image files
+
+```sh
+# compress
+jbig2 src.png >dst.jbig2
+
+# decompress
+jbig2dec -o dst.png src.jbig2
+```
+
+CCITT-Group4-compressed images are special,
+because the CCITT-Group4 format cannot store image width and height,
+so we need a container format like TIFF (or PDF)
+
+
+
+#### JBIG2 decoders
 
 https://github.com/ArtifexSoftware/jbig2dec
 

@@ -24,6 +24,11 @@ with pkgs;
     # checkInputs
     imagemagick
     libtiff
+
+    # JBIG2 is out of scope
+    # # JBIG2 compression
+    # jbig2enc
+    # jbig2dec
   ];
 
 /*

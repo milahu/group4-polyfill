@@ -24,7 +24,6 @@ enum Tag : uint16_t {
 enum Compression : uint32_t {
     NONE = 1,
     CCITT_GROUP4 = 4,
-    JBIG2 = 34712
 };
 
 struct StripView {
@@ -351,9 +350,9 @@ public:
         if (img.samples_per_pixel != 1)
             throw std::runtime_error("Only 1 sample per pixel supported");
 
-        if (img.compression != CCITT_GROUP4 &&
-            img.compression != JBIG2 &&
-            img.compression != NONE) {
+        if (img.compression != CCITT_GROUP4
+            // && img.compression != NONE
+        ) {
             throw std::runtime_error("Unsupported compression");
         }
 
