@@ -16,7 +16,7 @@ else
 fi
 
 ./tools/compress-group4.sh "$src" test.group4.tiff
-./build/tiff_cli test.group4.tiff -o test.group4.tiff.pgm
+./build/tiff_cli test.group4.tiff -o test.group4.tiff.bmp
 
 ./tools/compress-jpeg.sh "$src" test.jpeg.tiff
 echo this should fail

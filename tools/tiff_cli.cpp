@@ -4,6 +4,7 @@
 #include <string>
 
 #include "ccitt_g4_tiff/tiff.hpp"
+#include "bmp_encoder.cpp"
 
 static void print_image(const ccitt_g4_tiff::TiffImage& img) {
     std::cout << "TIFF Parsed Successfully\n";
@@ -69,7 +70,7 @@ void write_pgm(
 int main(int argc, char** argv)
 {
     if (argc < 2) {
-        fprintf(stderr, "Usage: %s input.tiff [-o output.pgm]\n", argv[0]);
+        fprintf(stderr, "Usage: %s input.tiff [-o output.bmp]\n", argv[0]);
         return 1;
     }
 
@@ -105,8 +106,17 @@ int main(int argc, char** argv)
 
         if (output_path) {
             try {
+                /*
                 printf("Writing decoded PGM image: %s\n", output_path);
                 write_pgm(output_path, img.pixels, img.width, img.height);
+                */
+                printf("Writing BMP image: %s\n", output_path);
+                // auto img_pixels_8bit = expand_1bit_to_8bit(img.pixels, img.width, img.height);
+                // auto bmp = encode_bmp_grayscale(img_pixels_8bit, img.width, img.height);
+                auto bmp = encode_bmp_1bit_fast(img.pixels, img.width, img.height);
+                std::ofstream bmp_file(output_path, std::ios::binary);
+                bmp_file.write((char*)bmp.data(), bmp.size());
+                bmp_file.close();
             } catch (const std::exception& e) {
                 fprintf(stderr, "Failed to write output: %s\n", e.what());
                 return 1;
