@@ -105,7 +105,7 @@ int main(int argc, char** argv)
 
         if (output_path) {
             try {
-                printf("Writing decoded image: %s\n", output_path);
+                printf("Writing decoded PGM image: %s\n", output_path);
                 write_pgm(output_path, img.pixels, img.width, img.height);
             } catch (const std::exception& e) {
                 fprintf(stderr, "Failed to write output: %s\n", e.what());
