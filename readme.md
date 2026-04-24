@@ -15,6 +15,9 @@ working prototype
 - test multi-strip images
 - test too-large images
 - streaming decode (for large TIFFs)
+- use TIFF parser from pdfium?
+    - [pdfium/core/fxcodec/tiff/tiff_decoder.cpp](https://pdfium.googlesource.com/pdfium/+/refs/heads/main/core/fxcodec/tiff/tiff_decoder.cpp)
+    - [pdfium/third_party/libtiff/tiff.h](https://pdfium.googlesource.com/pdfium/+/refs/heads/main/third_party/libtiff/tiff.h)
 
 
 
@@ -161,6 +164,31 @@ no CCITT-G4 compression
 https://pdfium.googlesource.com/pdfium/+/refs/heads/main/core/fxcodec/fax/faxmodule.cpp
 
 https://gitlab.com/libtiff/libtiff/-/blob/master/libtiff/tif_fax3.c
+
+
+
+## CCITT-G4 encoders
+
+
+
+### imagemagick
+
+https://github.com/ImageMagick/ImageMagick/blob/main/coders/fax.c
+
+```
+$ magick test.png -compress Group4 test.group4.tiff
+
+$ tiffinfo img/test.group4.tiff | grep Compression
+  Compression Scheme: CCITT Group 4
+```
+
+
+
+### Python PIL
+
+https://github.com/python-pillow/Pillow/issues/5740#issuecomment-4262300296
+
+https://github.com/milahu/binarize-pdf/commit/5a9ca491771b1cbd8e83c85b5d0201763e5312ab
 
 
 
